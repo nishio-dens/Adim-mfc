@@ -1,0 +1,23 @@
+#include <cctype> 
+#include <cstdlib> 
+#include <locale> 
+using namespace std; 
+deque<string> SplitMultiByteString(const string& str) { 
+    deque<string> words; 
+    int len_char; 
+    string::size_type first = string::size_type(), last, length = str.length(); 
+    locale previous = locale::global(locale("japanese", locale::ctype)); 
+    while (first < length) { 
+        while (first < length && (len_char = mblen(&str[first], MB_CUR_MAX)) == 1 && isspace(str[first])) 
+            first += len_char; 
+        last = first; 
+        while (last < length && ((len_char = mblen(&str[last], MB_CUR_MAX)) == 1 && !isspace(str[last]) || len_char > 1)) 
+            last += len_char; 
+        if (first != last) { 
+            words.push_back(str.substr(first, last - first)); 
+            first = last; 
+        } 
+    } 
+    locale::global(previous); 
+    return words; 
+} 
